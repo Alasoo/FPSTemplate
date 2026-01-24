@@ -79,7 +79,7 @@ namespace StateMachineCore.Player
 
 
         // returns false if there was an obstruction
-        protected bool SetCrouchingState(bool crouched, bool ignoreObstructions)
+        public bool SetCrouchingState(bool crouched, bool ignoreObstructions)
         {
             // set appropriate heights
             if (crouched)
@@ -120,7 +120,7 @@ namespace StateMachineCore.Player
 
 
 
-        protected void UpdateCharacterHeight(bool force, float deltaTime)
+        public void UpdateCharacterHeight(bool force, float deltaTime)
         {
             // Update height instantly
             if (force)
@@ -176,87 +176,8 @@ namespace StateMachineCore.Player
                 stateMachine.PlayerCamera.transform.localEulerAngles = new Vector3(stateMachine.m_CameraVerticalAngle, 0, 0);
             }
 
-            // character movement handling
             bool isSprinting = stateMachine.m_InputHandler.GetSprintInputHeld();
-            {
-                if (isSprinting)
-                {
-                    isSprinting = SetCrouchingState(false, false);
-                }
-
-                float speedModifier = isSprinting ? stateMachine.SprintSpeedModifier : 1f;
-
-                // converts move input to a worldspace vector based on our character's transform orientation
-                Vector3 worldspaceMoveInput = stateMachine.transform.TransformVector(stateMachine.m_InputHandler.GetMoveInput());
-
-                // handle grounded movement
-                if (stateMachine.isGrounded)
-                {
-                    // calculate the desired velocity from inputs, max speed, and current slope
-                    Vector3 targetVelocity = worldspaceMoveInput * stateMachine.MaxSpeedOnGround * speedModifier;
-                    // reduce speed if crouching by crouch speed ratio
-                    if (stateMachine.isCrouching)
-                        targetVelocity *= stateMachine.MaxSpeedCrouchedRatio;
-                    targetVelocity = GetDirectionReorientedOnSlope(targetVelocity.normalized, stateMachine.m_GroundNormal) *
-                                     targetVelocity.magnitude;
-
-                    // smoothly interpolate between our current velocity and the target velocity based on acceleration speed
-                    stateMachine.CharacterVelocity = Vector3.Lerp(stateMachine.CharacterVelocity, targetVelocity,
-                        stateMachine.MovementSharpnessOnGround * deltaTime);
-
-                    // jumping
-                    if (stateMachine.isGrounded && stateMachine.m_InputHandler.GetJumpInputDown())
-                    {
-                        // force the crouch state to false
-                        if (SetCrouchingState(false, false))
-                        {
-                            // start by canceling out the vertical component of our velocity
-                            stateMachine.CharacterVelocity = new Vector3(stateMachine.CharacterVelocity.x, 0f, stateMachine.CharacterVelocity.z);
-
-                            // then, add the jumpSpeed value upwards
-                            stateMachine.CharacterVelocity += Vector3.up * stateMachine.JumpForce;
-
-                            // play sound
-                            stateMachine.AudioSource.PlayOneShot(stateMachine.JumpSfx);
-
-                            // remember last time we jumped because we need to prevent snapping to ground for a short time
-                            stateMachine.m_LastTimeJumped = Time.time;
-                            stateMachine.HasJumpedThisFrame = true;
-
-                            // Force grounding to false
-                            stateMachine.IsGrounded = false;
-                            stateMachine.m_GroundNormal = Vector3.up;
-                        }
-                    }
-
-                    // footsteps sound
-                    float chosenFootstepSfxFrequency =
-                        (isSprinting ? stateMachine.FootstepSfxFrequencyWhileSprinting : stateMachine.FootstepSfxFrequency);
-                    if (stateMachine.m_FootstepDistanceCounter >= 1f / chosenFootstepSfxFrequency)
-                    {
-                        stateMachine.m_FootstepDistanceCounter = 0f;
-                        stateMachine.AudioSource.PlayOneShot(stateMachine.FootstepSfx);
-                    }
-
-                    // keep track of distance traveled for footsteps sound
-                    stateMachine.m_FootstepDistanceCounter += stateMachine.CharacterVelocity.magnitude * deltaTime;
-                }
-                // handle air movement
-                else
-                {
-                    // add air acceleration
-                    stateMachine.CharacterVelocity += worldspaceMoveInput * stateMachine.AccelerationSpeedInAir * deltaTime;
-
-                    // limit air speed to a maximum, but only horizontally
-                    float verticalVelocity = stateMachine.CharacterVelocity.y;
-                    Vector3 horizontalVelocity = Vector3.ProjectOnPlane(stateMachine.CharacterVelocity, Vector3.up);
-                    horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, stateMachine.MaxSpeedInAir * speedModifier);
-                    stateMachine.CharacterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
-
-                    // apply the gravity to the velocity
-                    stateMachine.CharacterVelocity += Vector3.down * stateMachine.GravityDownForce * deltaTime;
-                }
-            }
+            SprintMode(isSprinting, deltaTime);
 
             // apply the final calculated velocity value as a character movement
             Vector3 capsuleBottomBeforeMove = GetCapsuleBottomHemisphere();
@@ -274,6 +195,85 @@ namespace StateMachineCore.Player
 
                 stateMachine.CharacterVelocity = Vector3.ProjectOnPlane(stateMachine.CharacterVelocity, hit.normal);
             }
+        }
+
+
+        protected void SprintMode(bool isSprinting, float deltaTime)
+        {
+            float speedModifier = isSprinting ? stateMachine.SprintSpeedModifier : 1f;
+
+            // converts move input to a worldspace vector based on our character's transform orientation
+            Vector3 worldspaceMoveInput = stateMachine.transform.TransformVector(stateMachine.m_InputHandler.GetMoveInput());
+
+            // handle grounded movement
+            if (stateMachine.isGrounded)
+            {
+                // calculate the desired velocity from inputs, max speed, and current slope
+                Vector3 targetVelocity = worldspaceMoveInput * stateMachine.MaxSpeedOnGround * speedModifier;
+                // reduce speed if crouching by crouch speed ratio
+                if (stateMachine.isCrouching)
+                    targetVelocity *= stateMachine.MaxSpeedCrouchedRatio;
+                targetVelocity = GetDirectionReorientedOnSlope(targetVelocity.normalized, stateMachine.m_GroundNormal) *
+                                 targetVelocity.magnitude;
+
+                // smoothly interpolate between our current velocity and the target velocity based on acceleration speed
+                stateMachine.CharacterVelocity = Vector3.Lerp(stateMachine.CharacterVelocity, targetVelocity,
+                    stateMachine.MovementSharpnessOnGround * deltaTime);
+
+                // jumping
+                if (stateMachine.isGrounded && stateMachine.m_InputHandler.GetJumpInputDown())
+                {
+                    // force the crouch state to false
+                    if (SetCrouchingState(false, false))
+                    {
+                        // start by canceling out the vertical component of our velocity
+                        stateMachine.CharacterVelocity = new Vector3(stateMachine.CharacterVelocity.x, 0f, stateMachine.CharacterVelocity.z);
+
+                        // then, add the jumpSpeed value upwards
+                        stateMachine.CharacterVelocity += Vector3.up * stateMachine.JumpForce;
+
+                        // play sound
+                        stateMachine.AudioSource.PlayOneShot(stateMachine.JumpSfx);
+
+                        // remember last time we jumped because we need to prevent snapping to ground for a short time
+                        stateMachine.m_LastTimeJumped = Time.time;
+                        stateMachine.HasJumpedThisFrame = true;
+
+                        // Force grounding to false
+                        stateMachine.IsGrounded = false;
+                        stateMachine.m_GroundNormal = Vector3.up;
+                    }
+                }
+
+                // footsteps sound
+                float chosenFootstepSfxFrequency =
+                    (isSprinting ? stateMachine.FootstepSfxFrequencyWhileSprinting : stateMachine.FootstepSfxFrequency);
+                if (stateMachine.m_FootstepDistanceCounter >= 1f / chosenFootstepSfxFrequency)
+                {
+                    stateMachine.m_FootstepDistanceCounter = 0f;
+                    stateMachine.AudioSource.PlayOneShot(stateMachine.FootstepSfx);
+                }
+
+                // keep track of distance traveled for footsteps sound
+                stateMachine.m_FootstepDistanceCounter += stateMachine.CharacterVelocity.magnitude * deltaTime;
+            }
+            // handle air movement
+            else
+            {
+                // add air acceleration
+                stateMachine.CharacterVelocity += worldspaceMoveInput * stateMachine.AccelerationSpeedInAir * deltaTime;
+
+                // limit air speed to a maximum, but only horizontally
+                float verticalVelocity = stateMachine.CharacterVelocity.y;
+                Vector3 horizontalVelocity = Vector3.ProjectOnPlane(stateMachine.CharacterVelocity, Vector3.up);
+                horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, stateMachine.MaxSpeedInAir * speedModifier);
+                stateMachine.CharacterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
+
+                // apply the gravity to the velocity
+                stateMachine.CharacterVelocity += Vector3.down * stateMachine.GravityDownForce * deltaTime;
+            }
+
+
         }
 
 

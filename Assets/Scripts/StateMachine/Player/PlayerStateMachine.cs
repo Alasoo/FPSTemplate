@@ -189,9 +189,12 @@ namespace StateMachineCore.Player
 
         public const float k_GroundCheckDistanceInAir = 0.07f;
 
+        public static PlayerStateMachine Instance;
+
 
         void Awake()
         {
+            Instance = this;
             ActorsManager actorsManager = FindFirstObjectByType<ActorsManager>();
             if (actorsManager != null)
                 actorsManager.SetPlayer(gameObject);
@@ -222,7 +225,11 @@ namespace StateMachineCore.Player
 
             m_Health.OnDie += OnDie;
 
-            SwitchState(new PlayerFreeLookState(this));
+            PlayerFreeLookState freelook = new PlayerFreeLookState(this);
+            freelook.SetCrouchingState(false, true);
+            freelook.UpdateCharacterHeight(true, Time.deltaTime);
+
+            SwitchState(freelook);
         }
 
 

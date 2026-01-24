@@ -5,17 +5,25 @@ using UnityEngine;
 
 namespace StateMachineCore.Player
 {
-    public class PlayerFreeLookState : PlayerBaseState
+    public class PlayerCrouchState : PlayerBaseState
     {
         private readonly int FreeLookBlendTreeHash = Animator.StringToHash("FreeLookBlendTree");
-        public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+        public PlayerCrouchState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
 
         public override void Enter(){}
 
 
+
         public override void Tick(float deltaTime)
         {
+            bool isSprinting = stateMachine.m_InputHandler.GetSprintInputHeld();
+            if (isSprinting)
+            {
+                stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
+                return;
+            }
+
             CheckZKill();
             stateMachine.HasJumpedThisFrame = false;
 
@@ -47,38 +55,19 @@ namespace StateMachineCore.Player
             {
                 if (SetCrouchingState(!stateMachine.isCrouching, false))
                 {
-                    stateMachine.SwitchState(new PlayerCrouchState(stateMachine));
+                    stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
                     return;
                 }
             }
 
             UpdateCharacterHeight(false, deltaTime);
-
             HandleCharacterMovement(deltaTime);
         }
 
 
 
-        public override void Exit()
-        {
-            //stateMachine.InputReader.TargetEvent -= OnTarget;
-            //stateMachine.InputReader.JumpEvent -= OnJump;
-            //stateMachine.InputReader.DancePanelEvent -= OnDancePanel;
-        }
+        public override void Exit(){}
 
-
-
-        private void OnJump()
-        {
-            //if (stateMachine.ForceReceiver.MySlopeAngle > stateMachine.Controller.slopeLimit) return;
-            //stateMachine.SwitchState(new PlayerJumpingState(stateMachine));
-        }
-
-
-        private void OnFalling()
-        {
-            //stateMachine.SwitchState(new PlayerFallingState(stateMachine));
-        }
 
     }
 
