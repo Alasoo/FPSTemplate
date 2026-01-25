@@ -10,6 +10,7 @@ namespace StateMachineCore
         public abstract void Enter();
         public abstract void Tick(float deltaTime);
         public virtual void FixedTick(float deltaTime) { }  //opcional
+        public virtual void LateTick(float deltaTime) { }  //opcional
         public abstract void Exit();
 
         protected float GetNormalizedTime(Animator animator, string tag, int layerIndex = 0)

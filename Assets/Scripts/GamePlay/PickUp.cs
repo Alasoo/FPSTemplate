@@ -1,7 +1,8 @@
-﻿using Unity.FPS.Game;
+using StateMachineCore.Player;
+using Unity.FPS.Game;
 using UnityEngine;
 
-namespace Unity.FPS.Gameplay
+namespace Gameplay
 {
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public class Pickup : MonoBehaviour
@@ -38,6 +39,7 @@ namespace Unity.FPS.Gameplay
             m_StartPosition = transform.position;
         }
 
+        /*
         void Update()
         {
             // Handle bobbing
@@ -47,14 +49,15 @@ namespace Unity.FPS.Gameplay
             // Handle rotating
             transform.Rotate(Vector3.up, RotatingSpeed * Time.deltaTime, Space.Self);
         }
+        */
 
         void OnTriggerEnter(Collider other)
         {
-            PlayerCharacterController pickingPlayer = other.GetComponent<PlayerCharacterController>();
+            //PlayerCharacterController pickingPlayer = other.GetComponent<PlayerCharacterController>();
 
-            if (pickingPlayer != null)
+            if (other.gameObject == PlayerStateMachine.Instance.gameObject)
             {
-                OnPicked(pickingPlayer);
+                OnPicked();
 
                 PickupEvent evt = Events.PickupEvent;
                 evt.Pickup = gameObject;
@@ -62,7 +65,7 @@ namespace Unity.FPS.Gameplay
             }
         }
 
-        protected virtual void OnPicked(PlayerCharacterController playerController)
+        protected virtual void OnPicked()
         {
             PlayPickupFeedback();
         }

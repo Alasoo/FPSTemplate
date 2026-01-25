@@ -5,13 +5,17 @@ using UnityEngine;
 
 namespace StateMachineCore.Player
 {
-    public class PlayerFreeLookState : PlayerBaseState
+    public class PlayerJumpState : PlayerBaseState
     {
         private readonly int FreeLookBlendTreeHash = Animator.StringToHash("FreeLookBlendTree");
-        public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+        public PlayerJumpState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
 
-        public override void Enter() { }
+        public override void Enter()
+        {
+            Debug.Log($"Jump enter");
+            Jump();
+        }
 
 
         public override void Tick(float deltaTime)
@@ -43,22 +47,11 @@ namespace StateMachineCore.Player
                 }
             }
 
-            if (stateMachine.m_InputHandler.GetCrouchInputDown())
+            if (stateMachine.isGrounded)
             {
-                if (SetCrouchingState(!stateMachine.isCrouching, false))
-                {
-                    stateMachine.SwitchState(new PlayerCrouchState(stateMachine));
-                    return;
-                }
-            }
-
-            if (stateMachine.m_InputHandler.GetJumpInputDown())
-            {
-                stateMachine.SwitchState(new PlayerJumpState(stateMachine));
+                stateMachine.SwitchState(new PlayerFreeLookState(stateMachine));
                 return;
             }
-
-
 
             UpdateCharacterHeight(false, deltaTime);
 

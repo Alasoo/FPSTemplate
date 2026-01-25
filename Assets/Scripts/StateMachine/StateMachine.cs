@@ -25,6 +25,13 @@ namespace StateMachineCore
         {
             currentState?.FixedTick(Time.fixedDeltaTime);
         }
+
+        private void LateUpdate()
+        {
+            currentState?.LateTick(Time.deltaTime);
+        }
+
+
     }
 }
 

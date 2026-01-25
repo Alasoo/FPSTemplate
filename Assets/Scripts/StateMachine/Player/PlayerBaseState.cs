@@ -220,6 +220,7 @@ namespace StateMachineCore.Player
                 stateMachine.CharacterVelocity = Vector3.Lerp(stateMachine.CharacterVelocity, targetVelocity,
                     stateMachine.MovementSharpnessOnGround * deltaTime);
 
+                /*
                 // jumping
                 if (stateMachine.isGrounded && stateMachine.m_InputHandler.GetJumpInputDown())
                 {
@@ -244,6 +245,7 @@ namespace StateMachineCore.Player
                         stateMachine.m_GroundNormal = Vector3.up;
                     }
                 }
+                */
 
                 // footsteps sound
                 float chosenFootstepSfxFrequency =
@@ -272,10 +274,34 @@ namespace StateMachineCore.Player
                 // apply the gravity to the velocity
                 stateMachine.CharacterVelocity += Vector3.down * stateMachine.GravityDownForce * deltaTime;
             }
-
-
         }
 
+        protected void Jump()
+        {
+            if (stateMachine.isGrounded)
+            {
+                // force the crouch state to false
+                if (SetCrouchingState(false, false))
+                {
+                    // start by canceling out the vertical component of our velocity
+                    stateMachine.CharacterVelocity = new Vector3(stateMachine.CharacterVelocity.x, 0f, stateMachine.CharacterVelocity.z);
+
+                    // then, add the jumpSpeed value upwards
+                    stateMachine.CharacterVelocity += Vector3.up * stateMachine.JumpForce;
+
+                    // play sound
+                    stateMachine.AudioSource.PlayOneShot(stateMachine.JumpSfx);
+
+                    // remember last time we jumped because we need to prevent snapping to ground for a short time
+                    stateMachine.m_LastTimeJumped = Time.time;
+                    stateMachine.HasJumpedThisFrame = true;
+
+                    // Force grounding to false
+                    stateMachine.IsGrounded = false;
+                    stateMachine.m_GroundNormal = Vector3.up;
+                }
+            }
+        }
 
         // Gets a reoriented direction that is tangent to a given slope
         Vector3 GetDirectionReorientedOnSlope(Vector3 direction, Vector3 slopeNormal)
