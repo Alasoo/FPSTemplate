@@ -10,34 +10,24 @@ namespace MenuStateMachineSystem
         [SerializeField] private MenuState AudioMenuState;
         [SerializeField] private MenuState ControlMenuState;
 
-        private Vector2 startPos;
-        private MenuState currentMenu;
-
 
 
         public void OnClickVideoMenuState()
         {
-            currentMenu?.Exit();
-            currentMenu = VideoMenuState;
-            currentMenu?.Enter();
+            MenuStateMachine.Instance.ChangeMenu(VideoMenuState);
         }
         public void OnClickAudioMenuState()
         {
-            currentMenu?.Exit();
-            currentMenu = AudioMenuState;
-            currentMenu?.Enter();
+            MenuStateMachine.Instance.ChangeMenu(AudioMenuState);
         }
         public void OnClickControlMenuState()
         {
-            currentMenu?.Exit();
-            currentMenu = ControlMenuState;
-            currentMenu?.Enter();
+            MenuStateMachine.Instance.ChangeMenu(ControlMenuState);
         }
 
-        public void OnClickCloseSettings()
+        public void OnClickQuit()
         {
-            MenuStateMachine.Instance.CloseAll();
-            InputSystem.Instance.SetPlayerControls();
+            Application.Quit();
         }
 
 
@@ -47,17 +37,8 @@ namespace MenuStateMachineSystem
             AudioMenuState?.Exit();
             ControlMenuState?.Exit();
             base.Init();
-            startPos = transform.position;
-            currentMenu = VideoMenuState;
         }
 
-
-        public override void Enter()
-        {
-            transform.position = startPos;
-            base.Enter();
-            currentMenu?.Enter();
-        }
 
 
     }

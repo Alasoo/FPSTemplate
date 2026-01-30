@@ -30,10 +30,6 @@ namespace MenuStateMachineSystem
         }
 #endif
 
-        public void OnClick()
-        {
-            MenuStateMachine.Instance.ChangeMenu(this);
-        }
 
         public virtual void Init()
         {

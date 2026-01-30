@@ -20,9 +20,9 @@ namespace MenuStateMachineSystem
             SaveLoad.LoadAudio(out int _master);
 
             OnMasterSliderChange(_master);
-
+            MasterSlider.Slider.onValueChanged.RemoveAllListeners();
             MasterSlider.Slider.onValueChanged.AddListener(OnMasterSliderChange);
-    }
+        }
 
 
         public void OnMasterSliderChange(float value)
