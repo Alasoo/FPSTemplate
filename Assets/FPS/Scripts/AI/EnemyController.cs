@@ -3,6 +3,7 @@ using Unity.FPS.Game;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.Pool;
 
 namespace Unity.FPS.AI
 {
@@ -373,7 +374,7 @@ namespace Unity.FPS.AI
             }
 
             // this will call the OnDestroy function
-            Destroy(gameObject, DeathDuration);
+            //Destroy(gameObject, DeathDuration);
         }
 
         void OnDrawGizmosSelected()

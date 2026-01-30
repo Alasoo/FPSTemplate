@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using PoolSystem;
 using Unity.FPS.AI;
 using Unity.FPS.Game;
 using UnityEngine;
@@ -34,10 +35,12 @@ namespace StateMachineCore.Enemy.Turret
 
         void Start()
         {
-            m_Health = GetComponent<Health>();
+            if (m_Health == null)
+                m_Health = GetComponent<Health>();
             DebugUtility.HandleErrorIfNullGetComponent<Health, EnemyTurret>(m_Health, this, gameObject);
 
-            m_EnemyController = GetComponent<EnemyController>();
+            if (m_EnemyController == null)
+                m_EnemyController = GetComponent<EnemyController>();
             DebugUtility.HandleErrorIfNullGetComponent<EnemyController, EnemyTurret>(m_EnemyController, this,
                 gameObject);
 
@@ -47,7 +50,28 @@ namespace StateMachineCore.Enemy.Turret
 
             m_TimeStartedDetection = Mathf.NegativeInfinity;
             m_PreviousPivotAimingRotation = TurretPivot.rotation;
+        }
+
+        void OnEnable()
+        {
+            if (m_Health == null)
+                m_Health = GetComponent<Health>();
+            if (m_EnemyController == null)
+                m_EnemyController = GetComponent<EnemyController>();
+
+            m_Health.OnDie += OnDie;
             SwitchState(new EnemyIdleState(this));
+        }
+
+        void OnDisable()
+        {
+            m_Health.OnDie -= OnDie;
+            m_Health.Reset();
+        }
+
+        private void OnDie()
+        {
+            EnemyPool.Instance.Return(this);
         }
 
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using PoolSystem;
 using Unity.FPS.AI;
 using Unity.FPS.Game;
 using UnityEngine;
@@ -25,12 +26,15 @@ namespace StateMachineCore.Enemy.Robot
         public MinMaxFloat PitchDistortionMovementSpeed;
 
         public EnemyController m_EnemyController { get; private set; }
-        public AudioSource m_AudioSource  { get; private set; }
+        public AudioSource m_AudioSource { get; private set; }
+
+        Health m_Health;
 
 
         void Start()
         {
-            m_EnemyController = GetComponent<EnemyController>();
+            if (m_EnemyController == null)
+                m_EnemyController = GetComponent<EnemyController>();
             DebugUtility.HandleErrorIfNullGetComponent<EnemyController, EnemyMobile>(m_EnemyController, this,
                 gameObject);
 
@@ -41,8 +45,29 @@ namespace StateMachineCore.Enemy.Robot
             DebugUtility.HandleErrorIfNullGetComponent<AudioSource, EnemyMobile>(m_AudioSource, this, gameObject);
             m_AudioSource.clip = MovementSound;
             m_AudioSource.Play();
+        }
 
+        void OnEnable()
+        {
+            if (m_Health == null)
+                m_Health = GetComponent<Health>();
+            if (m_EnemyController == null)
+                m_EnemyController = GetComponent<EnemyController>();
+
+            m_Health.OnDie += OnDie;
             SwitchState(new EnemyPatrollState(this));
+        }
+
+        void OnDisable()
+        {
+            m_Health.OnDie -= OnDie;
+            m_Health.Reset();
+        }
+
+
+        private void OnDie()
+        {
+            EnemyPool.Instance.Return(this);
         }
 
     }

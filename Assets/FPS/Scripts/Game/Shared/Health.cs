@@ -83,5 +83,11 @@ namespace Unity.FPS.Game
                 OnDie?.Invoke();
             }
         }
+
+        public void Reset()
+        {
+            Heal(MaxHealth);
+            m_IsDead = false;
+        }
     }
 }
