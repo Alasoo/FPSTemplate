@@ -23,25 +23,5 @@ namespace MyUI
         }
 
 
-#if UNITY_EDITOR
-        void OnValidate()
-        {
-            if (slider == null)
-                slider = GetComponentInChildren<Slider>();
-
-            if (sliderValue == null)
-            {
-                foreach (Transform child in transform)
-                {
-                    if (sliderValue == null && child.name == "SliderValue")
-                        sliderValue = child.GetComponent<TMP_Text>();
-                }
-            }
-
-            sliderValue.text = slider.value + "%";
-            slider.onValueChanged.RemoveAllListeners();
-            slider.onValueChanged.AddListener(OnValueChange);
-        }
-#endif
     }
 }

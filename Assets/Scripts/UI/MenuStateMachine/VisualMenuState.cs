@@ -2,14 +2,11 @@ using System.Collections.Generic;
 using MyUI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MenuStateMachineSystem
 {
     public class VisualMenuState : MenuState
     {
-        [Header("BUTTON")]
-        [SerializeField] private Button videoButton;  //CustomButton
         [Header("DROPDOWN")]
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private TMP_Dropdown qualityDropdown;
@@ -50,15 +47,6 @@ namespace MenuStateMachineSystem
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
         }
 
-        public override void Enter()
-        {
-            base.Enter();
-            //videoButton.Select(true);
-        }
-        public override void Exit()
-        {
-            base.Exit();
-            //videoButton.Select(false);
-        }
+   
     }
 }
