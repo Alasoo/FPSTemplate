@@ -12,7 +12,6 @@ namespace MenuStateMachineSystem
         [field: Header("STATE MACHINE")]
         [SerializeField] List<MenuState> allStates = new();
         [SerializeField] private MenuState startMenuState;
-        [SerializeField] private PlayerInputHandler m_InputHandler;
 
         private Stack<MenuState> menuHistory = new Stack<MenuState>();
         private MenuState currentState;

@@ -6,9 +6,7 @@ namespace PoolSystem
     public class Pool<T> : MonoBehaviour where T : MonoBehaviour
     {
         [SerializeField] private T prefab;
-        //[SerializeField] private int initialAmount = 100;
 
-        // 1. Aquí está el Singleton Genérico correcto
         public static Pool<T> Instance { get; private set; }
         public Queue<T> pool = new Queue<T>();
 
@@ -25,6 +23,7 @@ namespace PoolSystem
         }
 
         /*
+        //POR SI SE QUIERE INICIAR AL PRINCIPIO EN EL BASE
         private void FillPool()
         {
             for (int i = 0; i < initialAmount; i++)
@@ -38,7 +37,6 @@ namespace PoolSystem
             go.transform.SetParent(transform);
             go.gameObject.SetActive(false);
 
-            // Obtenemos el componente T del prefab instanciado
             T component = go.GetComponent<T>();
 
             if (component == null)
@@ -64,8 +62,7 @@ namespace PoolSystem
                 if (pool.Count > 0) item = pool.Dequeue();
             }
 
-            // Activamos el objeto (accedemos al gameObject a través del componente)
-            item.gameObject.SetActive(true);
+            //item.gameObject.SetActive(true);
             return item;
         }
 

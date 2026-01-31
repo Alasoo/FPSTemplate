@@ -10,8 +10,6 @@ namespace MenuStateMachineSystem
         [SerializeField] private MenuState AudioMenuState;
         [SerializeField] private MenuState ControlMenuState;
 
-
-
         public void OnClickVideoMenuState()
         {
             MenuStateMachine.Instance.ChangeMenu(VideoMenuState);
@@ -29,17 +27,5 @@ namespace MenuStateMachineSystem
         {
             Application.Quit();
         }
-
-
-        public override void Init()
-        {
-            VideoMenuState?.Exit();
-            AudioMenuState?.Exit();
-            ControlMenuState?.Exit();
-            base.Init();
-        }
-
-
-
     }
 }
