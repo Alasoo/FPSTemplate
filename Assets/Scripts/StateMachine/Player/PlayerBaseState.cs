@@ -16,11 +16,37 @@ namespace StateMachineCore.Player
         const float k_JumpGroundingPreventionTime = 0.2f;
         const float k_GroundCheckDistanceInAir = 0.07f;
 
-        protected readonly int MovXHash = Animator.StringToHash("MovX");
-        protected readonly int MovYHash = Animator.StringToHash("MovY");
 
 
-        protected const float AnimatorDampTime = .1f;
+        protected void BasicCheck(float deltaTime)
+        {
+            CheckZKill();
+            stateMachine.HasJumpedThisFrame = false;
+
+            bool wasGrounded = stateMachine.isGrounded;
+            GroundCheck(deltaTime);
+
+            if (stateMachine.isGrounded && !wasGrounded)
+            {
+                // Fall damage
+                float fallSpeed = -Mathf.Min(stateMachine.CharacterVelocity.y, stateMachine.m_LatestImpactSpeed.y);
+                float fallSpeedRatio = (fallSpeed - stateMachine.MinSpeedForFallDamage) /
+                                       (stateMachine.MaxSpeedForFallDamage - stateMachine.MinSpeedForFallDamage);
+                if (stateMachine.RecievesFallDamage && fallSpeedRatio > 0f)
+                {
+                    float dmgFromFall = Mathf.Lerp(stateMachine.FallDamageAtMinSpeed, stateMachine.FallDamageAtMaxSpeed, fallSpeedRatio);
+                    stateMachine.m_Health.TakeDamage(dmgFromFall, null);
+
+                    // fall damage SFX
+                    stateMachine.AudioSource.PlayOneShot(stateMachine.FallDamageSfx);
+                }
+                else
+                {
+                    // land SFX
+                    stateMachine.AudioSource.PlayOneShot(stateMachine.LandSfx);
+                }
+            }
+        }
 
         protected void GroundCheck(float deltaTime)
         {

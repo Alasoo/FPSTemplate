@@ -14,7 +14,6 @@ namespace StateMachineCore.Enemy.Robot
         }
 
 
-
         protected const string k_AnimMoveSpeedParameter = "MoveSpeed";
         protected const string k_AnimAttackParameter = "Attack";
         protected const string k_AnimAlertedParameter = "Alerted";
