@@ -27,11 +27,16 @@ namespace StateMachineCore.Enemy.Robot
             }
 
             stateMachine.Animator.SetBool(k_AnimAlertedParameter, true);
-            
+
         }
 
         public override void Tick(float deltaTime)
         {
+            if (stateMachine.m_EnemyController.KnownDetectedTarget == null)
+            {
+                stateMachine.SwitchState(new EnemyPatrollState(stateMachine));
+                return;
+            }
             if (stateMachine.m_EnemyController.IsSeeingTarget && stateMachine.m_EnemyController.IsTargetInAttackRange)
             {
                 stateMachine.SwitchState(new EnemyAttackState(stateMachine));

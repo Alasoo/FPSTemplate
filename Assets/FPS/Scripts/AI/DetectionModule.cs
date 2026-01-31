@@ -137,5 +137,10 @@ namespace Unity.FPS.AI
                 Animator.SetTrigger(k_AnimAttackParameter);
             }
         }
+
+        private void OnDisable() {
+            HadKnownTarget = false;
+            KnownDetectedTarget = null;
+        }
     }
 }

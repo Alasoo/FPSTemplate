@@ -55,7 +55,7 @@ namespace StateMachineCore.Enemy.Robot
                 m_EnemyController = GetComponent<EnemyController>();
 
             m_Health.OnDie += OnDie;
-            SwitchState(new EnemyPatrollState(this));
+            SwitchState(new EnemyFollowState(this));
         }
 
         void OnDisable()

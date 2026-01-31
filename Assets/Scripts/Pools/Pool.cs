@@ -55,7 +55,6 @@ namespace PoolSystem
         public T Get()
         {
             T item;
-            Debug.Log($"Pool: {pool.Count}");
 
             if (pool.Count > 0)
                 item = pool.Dequeue();

@@ -36,6 +36,7 @@ namespace MenuStateMachineSystem
 
         private void OnDestroy()
         {
+            if (input == null) return;
             input.UI.Disable();
         }
 

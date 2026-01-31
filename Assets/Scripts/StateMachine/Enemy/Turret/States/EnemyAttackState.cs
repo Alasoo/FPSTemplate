@@ -33,6 +33,11 @@ namespace StateMachineCore.Enemy.Turret
 
         public override void Tick(float deltaTime)
         {
+            if (stateMachine.m_EnemyController.KnownDetectedTarget == null)
+            {
+                stateMachine.SwitchState(new EnemyIdleState(stateMachine));
+                return;
+            }
             bool mustShoot = Time.time > stateMachine.m_TimeStartedDetection + stateMachine.DetectionFireDelay;
             // Calculate the desired rotation of our turret (aim at target)
             Vector3 directionToTarget =

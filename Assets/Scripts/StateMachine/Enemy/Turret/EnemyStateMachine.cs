@@ -60,7 +60,7 @@ namespace StateMachineCore.Enemy.Turret
                 m_EnemyController = GetComponent<EnemyController>();
 
             m_Health.OnDie += OnDie;
-            SwitchState(new EnemyIdleState(this));
+            SwitchState(new EnemyAttackState(this));
         }
 
         void OnDisable()
